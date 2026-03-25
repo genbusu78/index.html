@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tennis Eli Club Breaza — Rezervare terenuri</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1D9E75;--gl:#E1F5EE;--gm:#5DCAA5;--gd:#085041;
+  --am:#BA7517;--al:#FAEEDA;
+  --bl:#185FA5;--bll:#E6F1FB;
+  --bg:#c8e6d0;
+  --card:#ffffff;
+  --border:#e5e5e3;
+  --border2:#d0d0ce;
+  --text:#1a1a18;
+  --muted:#6b6b68;
+  --hint:#9b9b97;
+  --surface:#f2f2f0;
+  --r-md:8px;--r-lg:12px;--r-xl:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;position:relative;overflow-x:hidden}
+.bg-balls{position:fixed;inset:0;pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding:1rem 1.25rem;background:rgba(255,255,255,0.85);border-radius:var(--r-xl);border:1px solid rgba(255,255,255,0.9)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:40px;height:40px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-logo svg{width:22px;height:22px;fill:white}
+.brand-name{font-size:17px;font-weight:500;color:var(--text)}
+.brand-sub{font-size:12px;color:var(--muted)}
+.user-area{display:flex;align-items:center;gap:8px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--gd);border:1.5px solid var(--gm)}
+.user-name{font-size:13px;color:var(--text)}
+.btn-login{font-size:13px;padding:7px 16px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--card);color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-login:hover{background:var(--surface)}
+.main-card{background:rgba(255,255,255,0.92);border-radius:var(--r-xl);padding:1.25rem;border:1px solid rgba(255,255,255,0.95)}
+.nav-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+.nav-tab{padding:9px 18px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'DM Sans',sans-serif}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--g);border-bottom-color:var(--g);font-weight:500}
+.view{display:none}.view.active{display:block}
+.week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px}
+.week-nav{display:flex;align-items:center;gap:10px}
+.week-nav button{padding:6px 14px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--card);color:var(--text);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif}
+.week-nav button:hover{background:var(--surface)}
+.week-title{font-size:15px;font-weight:500;color:var(--text)}
+.price-legend{display:flex;gap:14px;font-size:12px;color:var(--muted)}
+.price-legend span{display:flex;align-items:center;gap:5px}
+.dot{width:10px;height:10px;border-radius:3px}
+.court-filter{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.cf-btn{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;background:var(--card);color:var(--muted);font-family:'DM Sans',sans-serif}
+.cf-btn:hover{border-color:var(--gm);color:var(--gd)}
+.cf-btn.active{border-color:var(--g);background:var(--gl);color:var(--gd);font-weight:500}
+.cal-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border)}
+.cal-grid{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));min-width:600px}
+.cal-head{background:var(--surface);padding:8px 4px;text-align:center;font-size:12px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.cal-head:last-child{border-right:none}
+.cal-head.time-col{font-size:11px;color:var(--hint)}
+.cal-head.day-head{font-weight:500;color:var(--text)}
+.cal-head.day-head .day-name{font-size:10px;color:var(--muted);font-weight:400;text-transform:uppercase;letter-spacing:.5px}
+.cal-head.day-head .day-num{font-size:17px;line-height:1.3}
+.cal-head.weekend{background:#fdf8f0}
+.cal-head.today .day-num{color:var(--g);font-weight:500}
+.time-label{background:var(--surface);padding:5px 2px;text-align:center;font-size:10px;color:var(--hint);border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
+.slot{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:3px;cursor:pointer;min-height:36px;background:white}
+.slot:last-child{border-right:none}
+.slot:hover:not(.occ){background:var(--gl)}
+.slot.occ{cursor:not-allowed}
+.slot.we-bg{background:#fffcf5}
+.slot.we-bg:hover:not(.occ){background:var(--al)}
+.slot-inner{width:100%;height:100%;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;min-height:28px;color:transparent}
+.slot:hover:not(.occ) .slot-inner{color:var(--gd)}
+.slot.we-bg:hover:not(.occ) .slot-inner{color:var(--am)}
+.slot-taken .slot-inner{background:var(--surface);color:var(--hint) !important;cursor:not-allowed}
+.slot-mine .slot-inner{background:var(--gl);color:var(--gd) !important}
+.booking-form{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-top:1rem}
+.bf-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+.bf-close{font-size:20px;cursor:pointer;color:var(--muted);background:none;border:none;font-family:inherit}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:12px;color:var(--muted)}
+.form-group input,.form-group select{padding:8px 10px;border:1px solid var(--border);border-radius:var(--r-md);font-size:13px;background:var(--card);color:var(--text);outline:none;font-family:'DM Sans',sans-serif}
+.form-group input:focus,.form-group select:focus{border-color:var(--g)}
+.form-group input[readonly]{background:var(--surface);color:var(--muted)}
+.price-badge{display:inline-flex;align-items:center;padding:6px 12px;border-radius:var(--r-md);font-size:13px;font-weight:500}
+.price-wk{background:var(--gl);color:var(--gd)}
+.price-we{background:var(--al);color:var(--am)}
+.pay-methods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.pm{border:1.5px solid var(--border);border-radius:var(--r-md);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;color:var(--muted);background:var(--card)}
+.pm:hover,.pm.sel{border-color:var(--g);color:var(--gd);background:var(--gl)}
+.pm svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5}
+.card-fields{margin-bottom:14px}
+.summary-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--muted)}
+.summary-row span:last-child{font-weight:500;color:var(--text)}
+.summary-total{display:flex;justify-content:space-between;font-size:15px;font-weight:500;padding:10px 0 0;border-top:1px solid var(--border);margin-top:4px}
+.summary-total span:last-child{color:var(--g)}
+.btn-confirm{width:100%;padding:11px;background:var(--g);color:white;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-confirm:hover{background:var(--gd)}
+.login-wrap{display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:2rem;width:100%;max-width:420px}
+.login-card h2{font-size:22px;font-weight:500;margin-bottom:4px;color:var(--text)}
+.login-card p{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.login-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem}
+.lt{padding:7px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--muted)}
+.lt.active{color:var(--g);border-bottom-color:var(--g);font-weight:500}
+.login-form{display:flex;flex-direction:column;gap:12px}
+.login-form input{padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-md);font-size:14px;background:var(--card);color:var(--text);outline:none;font-family:'DM Sans',sans-serif}
+.login-form input:focus{border-color:var(--g)}
+.btn-g{padding:10px;background:var(--g);color:white;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif}
+.btn-g:hover{background:var(--gd)}
+.or-sep{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:10px 0}
+.or-sep::before,.or-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.demo-accounts{background:var(--surface);border-radius:var(--r-md);padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.9}
+.demo-accounts strong{color:var(--text)}
+.demo-accounts a{color:var(--g);text-decoration:none}
+.my-res-list{display:flex;flex-direction:column;gap:10px}
+.res-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.res-info{flex:1}
+.res-title{font-size:14px;font-weight:500;color:var(--text)}
+.res-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.res-code{font-size:12px;color:var(--hint);font-family:'DM Mono',monospace;margin-top:2px}
+.res-status{font-size:11px;padding:3px 10px;border-radius:20px}
+.st-confirmed{background:var(--gl);color:var(--gd)}
+.res-price{font-size:16px;font-weight:500;color:var(--g);white-space:nowrap}
+.success-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem;text-align:center;margin-top:1rem}
+.suc-icon{width:64px;height:64px;background:var(--gl);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.suc-icon svg{width:32px;height:32px;stroke:var(--g);fill:none;stroke-width:2.5}
+.suc-code{font-size:22px;font-weight:500;letter-spacing:3px;color:var(--g);background:var(--gl);padding:8px 22px;border-radius:var(--r-md);display:inline-block;margin:0.75rem 0;font-family:'DM Mono',monospace}
+.suc-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0.75rem 0 1.25rem}
+.suc-pill{font-size:12px;background:var(--surface);color:var(--muted);padding:5px 12px;border-radius:20px}
+.suc-pill strong{color:var(--text)}
+.empty-state{padding:3rem 1rem;text-align:center;color:var(--muted);font-size:14px}
+.empty-state a{color:var(--g);text-decoration:none}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.week-header{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<div class="bg-balls" id="bgBalls"></div>
+
+<div class="page">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 0 0 20M12 2a15 15 0 0 1 0 20" stroke="rgba(255,255,255,0.5)" stroke-width="1.2" fill="none"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Tennis Eli Club Breaza</div>
+      <div class="brand-sub">3 terenuri · Rezervare online</div>
+    </div>
+  </div>
+  <div class="user-area" id="userArea">
+    <button class="btn-login" onclick="showView('login')">Autentificare</button>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="nav-tabs" id="mainNav">
+    <div class="nav-tab active" onclick="showView('calendar')">Calendar săptămânal</div>
+    <div class="nav-tab" onclick="requireLogin('rezervari')">Rezervările mele</div>
+  </div>
+
+  <div class="view active" id="view-calendar">
+    <div class="week-header">
+      <div class="week-nav">
+        <button onclick="changeWeek(-1)">← Săpt. anterioară</button>
+        <div class="week-title" id="weekTitle"></div>
+        <button onclick="changeWeek(1)">Săpt. viitoare →</button>
+      </div>
+      <div class="price-legend">
+        <span><div class="dot" style="background:#E1F5EE;border:1px solid #5DCAA5"></div> Lun–Vin</span>
+        <span><div class="dot" style="background:#FAEEDA;border:1px solid #EF9F27"></div> Weekend +20%</span>
+        <span><div class="dot" style="background:#f2f2f0;border:1px solid #d0d0ce"></div> Ocupat</span>
+      </div>
+    </div>
+    <div class="court-filter" id="courtFilter">
+      <div class="cf-btn active" onclick="filterCourt(0,this)">Toate terenurile</div>
+      <div class="cf-btn" onclick="filterCourt(1,this)">Teren 1 — Hard (50/60 RON)</div>
+      <div class="cf-btn" onclick="filterCourt(2,this)">Teren 2 — Zgură (45/54 RON)</div>
+      <div class="cf-btn" onclick="filterCourt(3,this)">Teren 3 — Iarbă (55/66 RON)</div>
+    </div>
+    <div class="cal-wrap"><div class="cal-grid" id="calGrid"></div></div>
+    <div id="bookingFormWrap" style="display:none"></div>
+    <div id="successWrap" style="display:none"></div>
+  </div>
+
+  <div class="view" id="view-login">
+    <div class="login-wrap">
+      <div class="login-card">
+        <h2>Bine ai venit</h2>
+        <p>Autentifică-te pentru a rezerva un teren</p>
+        <div class="login-tabs">
+          <div class="lt active" onclick="switchLoginTab('in',this)">Autentificare</div>
+          <div class="lt" onclick="switchLoginTab('up',this)">Cont nou</div>
+        </div>
+        <div id="tab-in">
+          <div class="login-form">
+            <input type="email" id="li-email" placeholder="Email">
+            <input type="password" id="li-pass" placeholder="Parolă">
+            <button class="btn-g" onclick="doLogin()">Autentifică-te</button>
+          </div>
+          <div class="or-sep">sau</div>
+          <div class="demo-accounts">
+            <strong>Conturi demo:</strong><br>
+            ion@demo.ro / 1234 — <a href="#" onclick="quickLogin('ion@demo.ro','Ion Popescu');return false">Autentificare rapidă</a><br>
+            maria@demo.ro / 1234 — <a href="#" onclick="quickLogin('maria@demo.ro','Maria Ionescu');return false">Autentificare rapidă</a>
+          </div>
+        </div>
+        <div id="tab-up" style="display:none">
+          <div class="login-form">
+            <input type="text" id="reg-name" placeholder="Nume complet">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-pass" placeholder="Parolă (min. 4 caractere)">
+            <button class="btn-g" onclick="doRegister()">Creează cont</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-rezervari">
+    <div id="rezContent"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const COURTS=[null,
+  {name:'Teren 1',surface:'Hard',priceWk:50,priceWe:60},
+  {name:'Teren 2',surface:'Zgură',priceWk:45,priceWe:54},
+  {name:'Teren 3',surface:'Iarbă sintetică',priceWk:55,priceWe:66}
+];
+const HOURS=Array.from({length:12},(_,i)=>8+i);
+const DAYS_RO=['Dum','Lun','Mar','Mie','Joi','Vin','Sâm'];
+const DAYS_FULL=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
+const MONTHS_RO=['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','nov','dec'];
+
+let currentUser=null,weekOffset=0,selectedCourt=0,pendingSlot=null,selectedPayMethod='card';
+const occupiedData={};
+const myBookings=[];
+
+function isWeekend(d){return d.getDay()===0||d.getDay()===6}
+function genKey(date,court,hour){return date+'_c'+court+'_h'+hour}
+
+function getWeekDates(){
+  const now=new Date();
+  const mon=new Date(now);
+  mon.setDate(now.getDate()-((now.getDay()+6)%7)+weekOffset*7);
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d});
+}
+
+function seedOccupied(dates){
+  dates.forEach(d=>{
+    const dk=d.toISOString().slice(0,10);
+    [1,2,3].forEach(c=>{
+      HOURS.forEach(h=>{
+        const key=genKey(dk,c,h);
+        if(!(key in occupiedData)&&Math.random()<0.25) occupiedData[key]='other';
+      });
+    });
+  });
+}
+
+function renderCalendar(){
+  const dates=getWeekDates();
+  seedOccupied(dates);
+  const today=new Date().toISOString().slice(0,10);
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  grid.style.gridTemplateColumns='56px repeat(7,minmax(0,1fr))';
+  const d0=dates[0],d6=dates[6];
+  const fmt=d=>d.getDate()+' '+MONTHS_RO[d.getMonth()];
+  document.getElementById('weekTitle').textContent=fmt(d0)+' – '+fmt(d6)+' '+d6.getFullYear();
+  const th=document.createElement('div');th.className='cal-head time-col';grid.appendChild(th);
+  dates.forEach(d=>{
+    const we=isWeekend(d),dk=d.toISOString().slice(0,10),isToday=dk===today;
+    const h=document.createElement('div');
+    h.className='cal-head day-head'+(we?' weekend':'')+(isToday?' today':'');
+    h.innerHTML='<div class="day-name">'+DAYS_RO[d.getDay()]+'</div><div class="day-num">'+d.getDate()+'</div>';
+    grid.appendChild(h);
+  });
+  const courtsToShow=selectedCourt===0?[1,2,3]:[selectedCourt];
+  HOURS.forEach(hour=>{
+    const tl=document.createElement('div');
+    tl.className='time-label';
+    tl.textContent=String(hour).padStart(2,'0')+':00';
+    grid.appendChild(tl);
+    dates.forEach(d=>{
+      const dk=d.toISOString().slice(0,10),we=isWeekend(d);
+      const cell=document.createElement('div');
+      cell.className='slot'+(we?' we-bg':'');
+      const statuses=courtsToShow.map(c=>{
+        const key=genKey(dk,c,hour);
+        if(myBookings.find(b=>b.key===key)) return 'mine';
+        if(occupiedData[key]) return 'occ';
+        return 'free';
+      });
+      const hasMine=statuses.includes('mine'),allOcc=statuses.every(s=>s==='occ');
+      const priceLabel=we?(selectedCourt===0?'50–66':COURTS[selectedCourt].priceWe)+' RON':(selectedCourt===0?'45–55':COURTS[selectedCourt].priceWk)+' RON';
+      if(hasMine){cell.innerHTML='<div class="slot-inner slot-mine">Rezervat</div>';cell.classList.add('occ');}
+      else if(allOcc){cell.innerHTML='<div class="slot-taken"><div class="slot-inner">Ocupat</div></div>';cell.classList.add('occ');}
+      else{cell.innerHTML='<div class="slot-inner">'+priceLabel+'</div>';cell.addEventListener('click',()=>openBooking(dk,hour,d,we));}
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function filterCourt(id,el){selectedCourt=id;document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');closeBookingForm();renderCalendar()}
+function changeWeek(delta){weekOffset+=delta;closeBookingForm();renderCalendar()}
+
+function openBooking(dateStr,hour,dateObj,isWe){
+  if(!currentUser){showView('login');return}
+  const cid=selectedCourt===0?1:selectedCourt;
+  pendingSlot={dateStr,hour,dateObj,isWe,court:cid};
+  const wrap=document.getElementById('bookingFormWrap');
+  wrap.style.display='block';
+  wrap.innerHTML=buildBookingForm(dateStr,hour,dateObj,isWe,cid);
+  document.getElementById('successWrap').style.display='none';
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function buildBookingForm(dateStr,hour,dateObj,isWe,cid){
+  const c=COURTS[cid],price=isWe?c.priceWe:c.priceWk;
+  const dateDisp=DAYS_FULL[dateObj.getDay()]+', '+dateObj.getDate()+' '+MONTHS_RO[dateObj.getMonth()]+' '+dateObj.getFullYear();
+  const timeDisp=String(hour).padStart(2,'0')+':00 – '+String(hour+1).padStart(2,'0')+':00';
+  const courtOptions=[1,2,3].map(i=>{
+    const key=genKey(dateStr,i,hour);
+    const occ=myBookings.find(b=>b.key===key)||occupiedData[key];
+    const p=isWe?COURTS[i].priceWe:COURTS[i].priceWk;
+    return '<option value="'+i+'"'+(occ?' disabled':'')+(i===cid?' selected':'')+'>'+COURTS[i].name+' — '+COURTS[i].surface+' ('+p+' RON)'+(occ?' [Ocupat]':'')+'</option>';
+  }).join('');
+  return '<div class="booking-form">'
+    +'<div class="bf-title"><span>Rezervare rapidă</span><button class="bf-close" onclick="closeBookingForm()">×</button></div>'
+    +'<div class="form-grid">'
+      +'<div class="form-group"><label>Teren</label><select id="bf-court" onchange="updateBookingPrice('+(isWe?1:0)+')">'+courtOptions+'</select></div>'
+      +'<div class="form-group"><label>Data</label><input type="text" value="'+dateDisp+'" readonly></div>'
+      +'<div class="form-group"><label>Ora</label><input type="text" value="'+timeDisp+'" readonly></div>'
+      +'<div class="form-group"><label>Preț ('+(isWe?'weekend':'săptămână')+')</label><div id="bf-price"><span class="price-badge '+(isWe?'price-we':'price-wk')+'">'+price+' RON / oră</span></div></div>'
+    +'</div>'
+    +'<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Metodă de plată</div>'
+    +'<div class="pay-methods">'
+      +'<div class="pm sel" id="pm-card" onclick="selPay(\'card\')"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Card</div>'
+      +'<div class="pm" id="pm-transfer" onclick="selPay(\'transfer\')"><svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h9"/></svg>Transfer</div>'
+      +'<div class="pm" id="pm-cash" onclick="selPay(\'cash\')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="1"/><circle cx="12" cy="12" r="3"/></svg>Numerar</div>'
+    +'</div></div>'
+    +'<div id="card-section" class="card-fields"><div class="form-grid">'
+      +'<div class="form-group" style="grid-column:1/-1"><label>Număr card (simulare demo)</label><input type="text" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="let v=this.value.replace(/\\D/g,\'\').substring(0,16);this.value=v.replace(/(.{4})/g,\'$1 \').trim()"></div>'
+      +'<div class="form-group"><label>Expiră</label><input type="text" placeholder="MM/AA" maxlength="5"></div>'
+      +'<div class="form-group"><label>CVV</label><input type="text" placeholder="•••" maxlength="3"></div>'
+    +'</div></div>'
+    +'<div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:14px">'
+      +'<div class="summary-row"><span>Rezervare 1 oră</span><span id="sum-price">'+price+' RON</span></div>'
+      +'<div class="summary-row"><span>Taxă procesare (demo)</span><span>0 RON</span></div>'
+      +'<div class="summary-total"><span>Total de plată</span><span id="sum-total">'+price+' RON</span></div>'
+    +'</div>'
+    +'<button class="btn-confirm" onclick="confirmBooking()">Confirmă și plătește '+price+' RON</button>'
+  +'</div>';
+}
+
+function updateBookingPrice(isWeNum){
+  const isWe=isWeNum===1,sel=document.getElementById('bf-court');if(!sel)return;
+  const cid=parseInt(sel.value),price=isWe?COURTS[cid].priceWe:COURTS[cid].priceWk;
+  pendingSlot.court=cid;
+  const pb=document.getElementById('bf-price');
+  if(pb) pb.innerHTML='<span class="price-badge '+(isWe?'price-we':'price-wk')+'">'+price+' RON / oră</span>';
+  const sp=document.getElementById('sum-price'),st=document.getElementById('sum-total');
+  if(sp){sp.textContent=price+' RON';st.textContent=price+' RON';}
+  const btn=document.querySelector('.btn-confirm');
+  if(btn) btn.textContent='Confirmă și plătește '+price+' RON';
+}
+
+function selPay(m){
+  selectedPayMethod=m;
+  ['card','transfer','cash'].forEach(x=>{const el=document.getElementById('pm-'+x);if(el)el.classList.remove('sel');});
+  const el=document.getElementById('pm-'+m);if(el)el.classList.add('sel');
+  const cs=document.getElementById('card-section');if(cs)cs.style.display=m==='card'?'block':'none';
+}
+
+function confirmBooking(){
+  if(!pendingSlot)return;
+  const {dateStr,hour,dateObj,isWe,court}=pendingSlot;
+  const key=genKey(dateStr,court,hour);
+  occupiedData[key]='mine';
+  const c=COURTS[court],price=isWe?c.priceWe:c.priceWk;
+  const code='TC-'+Math.floor(100000+Math.random()*900000);
+  myBookings.push({key,code,court,dateStr,hour,dateObj,isWe,price});
+  closeBookingForm();renderCalendar();
+  const sw=document.getElementById('successWrap');
+  sw.style.display='block';
+  sw.innerHTML='<div class="success-box">'
+    +'<div class="suc-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>'
+    +'<div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:6px">Rezervare confirmată!</div>'
+    +'<div style="font-size:13px;color:var(--muted);margin-bottom:10px">Confirmarea a fost trimisă pe email.</div>'
+    +'<div class="suc-code">'+code+'</div>'
+    +'<div class="suc-pills">'
+      +'<div class="suc-pill"><strong>'+c.name+' — '+c.surface+'</strong></div>'
+      +'<div class="suc-pill"><strong>'+DAYS_FULL[dateObj.getDay()]+'</strong>, '+dateObj.getDate()+' '+MONTHS_RO[dateObj.getMonth()]+'</div>'
+      +'<div class="suc-pill">'+String(hour).padStart(2,'0')+':00 – '+String(hour+1).padStart(2,'0')+':00</div>'
+      +'<div class="suc-pill">Total: <strong>'+price+' RON</strong></div>'
+    +'</div>'
+    +'<button class="btn-g" style="max-width:200px;margin:0 auto;display:block" onclick="document.getElementById(\'successWrap\').style.display=\'none\'">Închide</button>'
+  +'</div>';
+  sw.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeBookingForm(){document.getElementById('bookingFormWrap').style.display='none';pendingSlot=null;}
+
+function renderMyBookings(){
+  const el=document.getElementById('rezContent');
+  if(!currentUser){el.innerHTML='<div class="empty-state">Autentifică-te pentru a vedea rezervările tale.</div>';return}
+  if(myBookings.length===0){el.innerHTML='<div class="empty-state">Nu ai nicio rezervare încă. <a href="#" onclick="showView(\'calendar\');return false">Rezervă acum</a></div>';return;}
+  el.innerHTML='<div style="margin-bottom:1rem;font-size:15px;font-weight:500;color:var(--text)">Rezervările tale ('+myBookings.length+')</div>'
+    +'<div class="my-res-list">'+myBookings.slice().reverse().map(b=>{
+      const c=COURTS[b.court];
+      return '<div class="res-card">'
+        +'<div class="res-info">'
+          +'<div class="res-title">'+c.name+' — '+c.surface+'</div>'
+          +'<div class="res-meta">'+DAYS_FULL[b.dateObj.getDay()]+', '+b.dateObj.getDate()+' '+MONTHS_RO[b.dateObj.getMonth()]+' · '+String(b.hour).padStart(2,'0')+':00 – '+String(b.hour+1).padStart(2,'0')+':00 · '+(b.isWe?'Weekend':'Zi lucrătoare')+'</div>'
+          +'<div class="res-code">'+b.code+'</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'
+          +'<span class="res-status st-confirmed">Confirmat</span>'
+          +'<span class="res-price">'+b.price+' RON</span>'
+        +'</div>'
+      +'</div>';
+    }).join('')+'</div>';
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.remove('active');
+    if((name==='calendar'&&i===0)||(name==='rezervari'&&i===1)) t.classList.add('active');
+  });
+  if(name==='rezervari') renderMyBookings();
+}
+
+function requireLogin(view){if(!currentUser){showView('login');return}showView(view);}
+
+function switchLoginTab(tab,el){
+  document.querySelectorAll('.lt').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-in').style.display=tab==='in'?'block':'none';
+  document.getElementById('tab-up').style.display=tab==='up'?'block':'none';
+}
+
+function setUser(name,email){
+  currentUser={name,email};
+  const initials=name.split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('userArea').innerHTML=
+    '<div class="user-avatar">'+initials+'</div>'
+    +'<div class="user-name">'+name+'</div>'
+    +'<button class="btn-login" onclick="doLogout()">Ieșire</button>';
+  showView('calendar');
+}
+
+function doLogin(){
+  const email=document.getElementById('li-email').value.trim();
+  if(!email){alert('Completează emailul!');return}
+  const nameMap={'ion@demo.ro':'Ion Popescu','maria@demo.ro':'Maria Ionescu'};
+  const name=nameMap[email]||(email.split('@')[0].charAt(0).toUpperCase()+email.split('@')[0].slice(1));
+  setUser(name,email);
+}
+
+function quickLogin(email,name){setUser(name,email)}
+
+function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  if(!name||!email||pass.length<4){alert('Completează toate câmpurile! Parola min. 4 caractere.');return}
+  setUser(name,email);
+}
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('userArea').innerHTML='<button class="btn-login" onclick="showView(\'login\')">Autentificare</button>';
+  showView('calendar');
+}
+
+function drawBalls(){
+  const container=document.getElementById('bgBalls');
+  const W=window.innerWidth, H=document.body.scrollHeight||window.innerHeight;
+  const balls=[
+    {x:0.04, y:0.04, s:110},
+    {x:0.88, y:0.02, s:140},
+    {x:0.95, y:0.35, s:80},
+    {x:0.02, y:0.42, s:95},
+    {x:0.78, y:0.68, s:120},
+    {x:0.40, y:0.90, s:85},
+    {x:0.15, y:0.80, s:100},
+    {x:0.62, y:0.08, s:70},
+    {x:0.50, y:0.55, s:55},
+    {x:0.30, y:0.18, s:65},
+    {x:0.85, y:0.88, s:90},
+    {x:0.55, y:0.38, s:45}
+  ];
+  container.innerHTML=balls.map(b=>{
+    const cx=Math.round(b.x*W), cy=Math.round(b.y*H), r=b.s/2;
+    return '<svg style="position:absolute;left:'+(cx-r)+'px;top:'+(cy-r)+'px;width:'+b.s+'px;height:'+b.s+'px;opacity:0.18" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+      +'<circle cx="50" cy="50" r="47" fill="#c8e635" stroke="#88aa00" stroke-width="3"/>'
+      +'<path d="M50,3 C32,10 20,28 20,50 C20,72 32,90 50,97" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.7"/>'
+      +'<path d="M50,3 C68,10 80,28 80,50 C80,72 68,90 50,97" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.7"/>'
+      +'</svg>';
+  }).join('');
+}
+
+drawBalls();
+window.addEventListener('resize', drawBalls);
+renderCalendar();
+</script>
+</body>
+</html>
